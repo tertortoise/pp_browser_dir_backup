@@ -1,7 +1,7 @@
 import { ThemeProvider } from '@mui/material/styles';
 
-import SyncDirApp from "./dirsync/SyncDirApp";
-import { SyncDirProvider } from "./dirsync/SyncDirContextProvider";
+import SyncDirApp from "./containers/SyncDirApp";
+import { SyncDirProvider } from "./state/SyncDirContextProvider";
 import theme from './theme';
 import { CssBaseline } from '@mui/material';
 
