@@ -34,9 +34,15 @@ yarn-error.log
 testem.log
 /typings
 
+/testfiles
+/temp
+
 # System Files
 .DS_Store
 Thumbs.db
 
 .nx/cache
 .nx/workspace-data
+
+firebase.json
+.firebasefir

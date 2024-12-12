@@ -5,10 +5,16 @@
   "scripts": {
     "start": "nx serve",
     "build": "nx build",
-    "test": "nx test"
+    "test": "nx test",
+    "lint": "nx lint",
+    "readme": "marked -i readme.md -o temp/readme.html"
   },
   "private": true,
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^6.2.0",
+    "@mui/material": "^6.2.0",
     "react": "18.3.1",
     "react-dom": "18.3.1"
   },
@@ -48,6 +54,7 @@
     "eslint-plugin-react-hooks": "5.0.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
+    "marked": "^15.0.3",
     "nx": "20.2.2",
     "prettier": "^2.6.2",
     "react-refresh": "^0.10.0",
