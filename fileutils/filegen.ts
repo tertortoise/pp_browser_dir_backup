@@ -7,14 +7,13 @@ import path from 'node:path';
 import scenarios, { DirStructure } from './scenarios';
 import util from 'node:util';
 
-console.log(process.argv)
 const scenariosSelection = new Set((process.argv[2] ?? '').split(' '));
 scenariosSelection.delete('');
 
 const scenariosToCreate = scenariosSelection.size ? Object.entries(scenarios).filter(([scenarioName,]) => scenariosSelection.has(scenarioName)) : Object.entries(scenarios);
 
 const rootDirPathLeft = process.env.TOP_LEVEL_DIR_LEFT ?? path.resolve(process.cwd(), './testfiles');
-const rootDirPathRight = process.env.TOP_LEVEL_DIR_RIGHT ?? path.resolve(process.cwd(), 'D:/test');
+const rootDirPathRight = process.env.TOP_LEVEL_DIR_RIGHT ?? path.resolve(process.cwd(), 'E:/test');
 
 createDirSync(rootDirPathLeft);
 createDirSync(rootDirPathRight);
@@ -23,13 +22,9 @@ for (const scenarioToCreate of scenariosToCreate) {
     try {
         const scenarioRootDirPathLeft = path.resolve(rootDirPathLeft, scenarioToCreate[0]);
         const scenarioRootDirPathRight = path.resolve(rootDirPathRight, scenarioToCreate[0]);
-        // const scenarioLeftDirPath = path.resolve(scenarioRootDirPathLeft, 'left');
-        // const scenarioRightDirPath = path.resolve(scenarioRootDirPathRight, 'right');
 
         createDirSync(scenarioRootDirPathLeft);
         createDirSync(scenarioRootDirPathRight);
-        // createDirSync(scenarioLeftDirPath);
-        // createDirSync(scenarioRightDirPath);
 
         const leftDirPromise = createDirStructure(scenarioRootDirPathLeft, scenarioToCreate[1].left, scenarioToCreate[1].isCaseSensitive);
         const rightDirPromise = createDirStructure(scenarioRootDirPathRight, scenarioToCreate[1].right, scenarioToCreate[1].isCaseSensitive);

@@ -20,7 +20,6 @@ function getDiffStatsLabels(syncStateDiff: SyncFlowState[typeof SYNC_STEP_DIFF])
     }
     const diffStatsTotals = syncStateDiff.diffStatsTotals;
     if (!diffStatsTotals) {
-        console.log({syncStateDiff}); // WIP
         return null;
     }
     const totalFilesCount = diffStatsTotals.copy.filesCount + diffStatsTotals.delete.filesCount + diffStatsTotals.equal.filesCount;
@@ -35,7 +34,6 @@ function getDiffStatsLabels(syncStateDiff: SyncFlowState[typeof SYNC_STEP_DIFF])
 }
 
 export default function SyncDirBlock({ rootDirNames }: { rootDirNames: { [LEFT]: string;[RIGHT]: string } }) {
-
     const syncState = useSyncState();
 
     const { viewOptions: { isFileMtimeVisible, isFileSizeVisible } } = syncState;

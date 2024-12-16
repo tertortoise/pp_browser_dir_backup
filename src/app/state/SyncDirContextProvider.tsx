@@ -24,8 +24,8 @@ const initialState: SyncFlowState = {
   },
   syncOptions: { 
     isCaseSensitive: getDefaultCaseSensitivity(),
-    bufferCopyMaxSize: 1e6,
-    numberTransactionsMax: 100,
+    bufferCopyMaxSize: 1e7,
+    numberTransactionsMax: 5,
   },
   messages: [],
 };

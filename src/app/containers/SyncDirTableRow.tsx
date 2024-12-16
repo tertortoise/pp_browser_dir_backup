@@ -1,8 +1,8 @@
-import { TableRow, TableCell, IconButton, Box, Icon } from "@mui/material";
+import { TableRow, TableCell, IconButton, Box } from "@mui/material";
 
 import { LEFT, RIGHT, SYNC_STATUS_AGGR_CHANGE, SYNC_STATUS_CHANGE, NOOP, SYNC_ACTION_EQUAL, SYNC_ACTION_COPYLEFT, SYNC_ACTION_DELETERIGHT, SYNC_ACTION_OVERWRITE, ACTION_STATUS_INIT, ACTION_STATUS_ERROR, ActionStatus, ACTION_STATUS_SUCC, ACTION_STATUS_WIP, ACTION_STATUS_MIXED, isTypeFile, ACTION_NOT_REQUIRED, SyncStatusEntityInfo, SyncTransactionErrorInfo } from "../types/servicesTypes";
 import { DialogContentInfo, SyncTableRow } from "../types/viewTypes";
-import { Dispatch, ReactNode, SetStateAction, useMemo, useSyncExternalStore } from "react";
+import { Dispatch, memo, ReactNode, SetStateAction, useMemo, useSyncExternalStore } from "react";
 import { useSyncManagerRef } from "../state/SyncDirContextProvider";
 import CopyLeftIcon from "../icons/CopyLeftIcon";
 import DeleteIcon from "../icons/DeleteIcon";
@@ -59,8 +59,8 @@ function convertToDialogContentInfo(syncRow: SyncTableRow, input: SyncTransactio
     }
 }
 
-export default function SyncDirTableRow({ syncRow, isSizeVisible, isMtimeVisible, handleCollapseSingleDir, isCollapsed, setDialogContent }: SyncDirTableRowProps) {
-
+function SyncDirTableRow({ syncRow, isSizeVisible, isMtimeVisible, handleCollapseSingleDir, isCollapsed, setDialogContent }: SyncDirTableRowProps) {
+    
     const syncManagerRef = useSyncManagerRef();
 
     const syncTransactionId = syncRow.entityId;
@@ -84,7 +84,7 @@ export default function SyncDirTableRow({ syncRow, isSizeVisible, isMtimeVisible
     const syncStatusTimestamp = syncStatusEntityInfo?.syncStatusTimestamp ?? Date.now();
     const syncTransactionErrorInfo = syncStatusEntityInfo?.syncTransactionErrorInfo;
     const dialogContentInfo = convertToDialogContentInfo(syncRow, syncTransactionErrorInfo);
-    
+   
     const syncStatusColor = syncRow.syncCfg.syncAction === SYNC_ACTION_EQUAL || syncStatus === undefined ? 'currentColor' : getHslaString(STROKE_COLORS[syncStatus]);
 
     const typeCellContent = useMemo(() => {
@@ -158,7 +158,7 @@ export default function SyncDirTableRow({ syncRow, isSizeVisible, isMtimeVisible
         }
         return Component ? <Component /> : null;
 
-    }, [syncStatus]);
+    }, [syncStatus, dialogContentInfo, setDialogContent]);
 
     return <TableRow hover role="checkbox" tabIndex={-1} key={syncRow.entityId}>
         {typeCellContent}
@@ -195,3 +195,5 @@ export default function SyncDirTableRow({ syncRow, isSizeVisible, isMtimeVisible
         />
     </TableRow>;
 };
+
+export default memo(SyncDirTableRow);

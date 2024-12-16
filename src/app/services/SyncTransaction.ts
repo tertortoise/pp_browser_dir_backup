@@ -113,7 +113,6 @@ export abstract class SyncTransactionBase<D extends DirEntity> {
     }
 
     startTransaction(removeTransactionFromBufferCb: () => void) {
-
         if (this.#syncStatus !== ACTION_NOT_REQUIRED) {
             this.setSyncStatus(ACTION_STATUS_WIP);
         }
@@ -123,8 +122,8 @@ export abstract class SyncTransactionBase<D extends DirEntity> {
             this.#iterateOverTransactionGenerator(this.executeTransaction());
 
         transactionPromise
-            .then(({ transactionTimestamp = Date.now() }) => { // WIP
-
+            .then(({ transactionTimestamp = Date.now() }) => {
+                
                 if (this.#syncStatus !== ACTION_NOT_REQUIRED) {
                     this.setSyncStatus(ACTION_STATUS_SUCC, ['ok'], transactionTimestamp);
                 }
