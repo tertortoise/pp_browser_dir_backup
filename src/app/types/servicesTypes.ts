@@ -1,4 +1,3 @@
-import { DialogContentInfo } from "./viewTypes";
 import { DirEntityDir, DirEntityFile } from "../services/DirManager";
 
 export const NOOP = () => {};

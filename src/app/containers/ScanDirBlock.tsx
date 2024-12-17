@@ -1,4 +1,4 @@
-import { SyncSide, SYNC_STEP_SCAN } from "../types/servicesTypes";
+import { SyncSide, SYNC_STEP_SCAN, ACTION_STATUS_WIP, ACTION_STATUS_SUCC } from "../types/servicesTypes";
 import { Box, TableContainer, Table, TablePagination } from "@mui/material";
 import { isScanFlowSideStateOk, ScanTableRow, ScnaDirChildrenTreeSnapshot } from "../types/viewTypes";
 import usePaging from "../hooks/usePaging";
@@ -7,6 +7,7 @@ import useGetTableRows from "../hooks/useGetTableRows";
 import ScanDirTableHead from "./ScanDirTableHead";
 import { getSizeHuman } from "./utils";
 import  ScanDirTableBody from "../components/ScanDirTableBody";
+import { useLayoutEffect } from "react";
 
 
 interface ScanDirBlockProps {
@@ -26,9 +27,15 @@ export function ScanDirBlock({ rootDirName, syncSide }: ScanDirBlockProps) {
 
     const currScanStatus = syncStateScan.status;
 
+    const rootDirId = currScanStatus === ACTION_STATUS_SUCC ? syncStateScan.rootDirId : undefined;
+
     const dirTreeSnapshot = isScanFlowSideStateOk(syncStateScan) ? syncStateScan.rootDirTree : undefined;
 
     const { handleCollapseSingleDir, collapsedDirsSet, tableRows } = useGetTableRows<ScnaDirChildrenTreeSnapshot, ScanTableRow>(dirTreeSnapshot);
+
+    useLayoutEffect(() => {
+        handleChangePage(null, 0);
+    }, [rootDirId, handleChangePage]);
 
     return (
         <Box

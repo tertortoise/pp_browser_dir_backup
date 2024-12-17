@@ -24,7 +24,7 @@ export default function SyncDirTableHead({ rootDirNames }: SyncDirTableProps) {
 
     const syncState = useSyncState();
 
-    const { viewOptions: { isFileMtimeVisible, isFileSizeVisible, isDirSizeVisible } } = syncState;
+    const { viewOptions: { isFileMtimeVisible, isFileSizeVisible } } = syncState;
 
     const syncStateStatus = syncState[SYNC_STEP_SYNC];
 
@@ -82,7 +82,7 @@ export default function SyncDirTableHead({ rootDirNames }: SyncDirTableProps) {
                             Time mod.
                         </Typography>
                     }
-                    {(isFileSizeVisible || isDirSizeVisible) &&
+                    {isFileSizeVisible &&
                         <Typography
                             component="span"
                             sx={theme => ({ ...getSizeMtimeMixin(theme, 'size', 'thead') })}
@@ -99,7 +99,7 @@ export default function SyncDirTableHead({ rootDirNames }: SyncDirTableProps) {
 
         return { leftNameHeader, rightNameHeader };
 
-    }, [rootDirNames, isFileMtimeVisible, isFileSizeVisible, isDirSizeVisible]);
+    }, [rootDirNames, isFileMtimeVisible, isFileSizeVisible]);
 
     return <TableHead>
         <TableRow>

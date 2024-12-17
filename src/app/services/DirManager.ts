@@ -203,9 +203,9 @@ export class DirEntityDir extends DirEntityBase {
             } else {
 
                 acc.dirsCount++;
-                acc.dirsCount += child.scanDirChildrenStats?.dirsCount ?? 0;
-                acc.filesCount += child.scanDirChildrenStats?.filesCount ?? 0;
-                acc.size += child.scanDirChildrenStats?.size ?? 0;
+                acc.dirsCount += child.scanDirChildrenStats.dirsCount;
+                acc.filesCount += child.scanDirChildrenStats.filesCount;
+                acc.size += child.scanDirChildrenStats.size;
 
             }
             return acc;
@@ -260,9 +260,7 @@ export class DirEntityFile extends DirEntityBase {
             this.actionStatusResolutionCfg.resolver({ entityId: this.entityId, actionType: SCAN_ACTION_ENTITY, entityType: TYPE_FILE, statusValue: ACTION_STATUS_SUCC });
 
         } catch (e: unknown) {
-            console.log({ e }, this.entityHandle, this.entityName); // WIP
-            this.throwScanError(ERR_UNTYPED, 'Error doing file scan', causifyCaughtErr(null));
-
+            this.throwScanError(ERR_UNTYPED, 'Error doing file scan', causifyCaughtErr(e));
         }
     }
 }

@@ -47,7 +47,7 @@ export function getDefaultCaseSensitivity() {
 
     const os = detectOs();
 
-    if (os.includes('lin')) {
+    if (os.toLowerCase().includes('lin')) {
         return true;
     }
     return false;
@@ -152,7 +152,7 @@ export function getSnapshotOfDirTree(rootDirChildrenTree: DirChildrenTree, path:
             snapshotTree.set(entityId, tableRowFile);
         } else {
 
-            const isEmpty = !Boolean(entity.children.size);
+            const isEmpty = !entity.children.size;
             const tableRowDir: ScanDirEntrySnapshot = {
                 ...getTableRowBase(entity, path),
                 parentIds,
@@ -185,7 +185,7 @@ export function getSnapshotOfSyncTree(syncTree: Map<string, SyncTransaction>, pa
             };
             snapshotTree.set(entityId, fileRow);
         } else {
-            const isEmpty = !Boolean(entity.children?.size);
+            const isEmpty = !entity.children?.size;
             const dirRow: SyncTransactionDirSnapshot = {
                 ...getTableRowBase(entity, path),
                 parentIds,
@@ -251,7 +251,7 @@ function getScanTableRowDir(entity: DirEntityDir, path: string): Omit<ScanTableR
         ...getTableRowBase(entity, path),
         entityType: TYPE_DIR,
         scanDirChildrenStats: entity.scanDirChildrenStats,
-        isEmpty: !Boolean(entity.children.size),
+        isEmpty: !entity.children.size,
         scanStatus: entity.scanNestedChildrenStatus.statusValue,
     };
 };

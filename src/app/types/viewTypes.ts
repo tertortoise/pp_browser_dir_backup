@@ -46,7 +46,6 @@ export function isScanFlowSideStateOk(scanFlowSideState: ScanFlowSideState): sca
 export interface ViewOptions {
     sortedByName: SortType;
     isFileSizeVisible: boolean;
-    isDirSizeVisible?: boolean;
     isFileMtimeVisible: boolean;
     rowsPerPage: number;
 };

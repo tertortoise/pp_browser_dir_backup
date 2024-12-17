@@ -14,7 +14,7 @@ interface ScanDirTableHeadProps {
     currScanStatus: ActionStatus;
 }
 
-function ScanDirTableHead({ syncSide, currScanStatus, viewOptions: {isFileSizeVisible, isFileMtimeVisible, isDirSizeVisible}, isCaseSensitive, rootDirName }: ScanDirTableHeadProps) {
+function ScanDirTableHead({ syncSide, currScanStatus, viewOptions: {isFileSizeVisible, isFileMtimeVisible}, isCaseSensitive, rootDirName }: ScanDirTableHeadProps) {
 
     const {
         handleDirPick,
@@ -90,7 +90,7 @@ function ScanDirTableHead({ syncSide, currScanStatus, viewOptions: {isFileSizeVi
                         </Typography>
                     }
                     {
-                        (isFileSizeVisible || isDirSizeVisible)
+                        isFileSizeVisible
                         && <Typography
                             component="span"
                             sx={theme => ({ ...getSizeMtimeMixin(theme, 'size', 'thead') })}

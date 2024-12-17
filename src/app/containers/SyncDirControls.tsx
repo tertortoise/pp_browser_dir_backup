@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box, Button, Tooltip } from '@mui/material';
 import { useSyncState } from '../state/SyncDirContextProvider';
 import { SYNC_STEP_SCAN, SYNC_STEP_DIFF, LEFT, RIGHT, ACTION_STATUS_WIP, ACTION_STATUS_SUCC, SYNC_STEP_SYNC, ACTION_STATUS_ERROR, ACTION_STATUS_INIT, ACTION_NOT_REQUIRED } from '../types/servicesTypes';
@@ -77,6 +77,20 @@ export default function SyncDirControls() {
         syncBtnHandler = handleSync;
         syncBtnTooltip = 'backup left to right'
     }
+
+    useEffect(()=> {
+        const beforeUnloadHandler = (e: Event) => {
+            console.log(isSyncing, {e}); // WIP
+            e.preventDefault();
+            e.returnValue = true;
+          };
+
+          if (isSyncing) {
+            window.addEventListener('beforeunload', beforeUnloadHandler);
+          }
+
+          return () => window.removeEventListener('beforeunload', beforeUnloadHandler);
+    }, [isSyncing]);
 
     return (
         <Box

@@ -18,7 +18,7 @@ interface ScanDirTableRowProps {
     viewOptions: ViewOptions;
 };
 
-function ScanDirTableRow({ scanTableRow, column, handleCollapseSingleDir, isCollapsed, viewOptions: {isFileSizeVisible, isFileMtimeVisible, isDirSizeVisible} }: ScanDirTableRowProps) {
+function ScanDirTableRow({ scanTableRow, column, handleCollapseSingleDir, isCollapsed, viewOptions: {isFileSizeVisible, isFileMtimeVisible} }: ScanDirTableRowProps) {
 
     const isDir = !isTypeFile(scanTableRow);
 
@@ -58,8 +58,7 @@ function ScanDirTableRow({ scanTableRow, column, handleCollapseSingleDir, isColl
                             }}
                         >{scanTableRow.entityName}</Typography>
                         {isTypeFile(scanTableRow) && isFileMtimeVisible && <Typography component="span" sx={theme => ({ ...getSizeMtimeMixin(theme, 'mtime', 'tbody') })}>{getMtimeHuman(scanTableRow.mtime)}</Typography>}
-                        {isTypeFile(scanTableRow) && isFileSizeVisible && <Typography component="span" sx={theme => ({ ...getSizeMtimeMixin(theme, 'size', 'tbody') })}>{getSizeHuman(scanTableRow.size)}</Typography>}
-                        {!isTypeFile(scanTableRow) && isDirSizeVisible && <Typography component="span" sx={theme => ({ ...getSizeMtimeMixin(theme, 'size', 'tbody') })}>{getSizeHuman(scanTableRow.scanDirChildrenStats?.size ?? null)}</Typography>}
+                        {isFileSizeVisible && <Typography component="span" sx={theme => ({ ...getSizeMtimeMixin(theme, 'size', 'tbody') })}>{getSizeHuman(isTypeFile(scanTableRow) ? scanTableRow.size : scanTableRow.scanDirChildrenStats?.size ?? null)}</Typography>}
                     </Box>
                 </Box>
 

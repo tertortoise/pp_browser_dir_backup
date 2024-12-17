@@ -76,7 +76,7 @@ export default function SyncOptionsMenu() {
 
     const { handleViewOptionsChange } = useSyncControls(setMenuAnchorEl);
 
-    const { isFileSizeVisible, isFileMtimeVisible, isDirSizeVisible, sortedByName } = syncState.viewOptions;
+    const { isFileSizeVisible, isFileMtimeVisible, sortedByName } = syncState.viewOptions;
 
     const syncSettingsApplied = { ...syncState.syncOptions, bufferCopyMaxSize: syncState.syncOptions.bufferCopyMaxSize / 1e6 };
 
@@ -249,21 +249,7 @@ export default function SyncOptionsMenu() {
                         }
                     </ListItemIcon>
                     <ListItemText>
-                        File size column
-                    </ListItemText>
-                </MenuItem>
-                <MenuItem
-                    onClick={() => handleViewOptionsChange('isDirSizeVisible', !isDirSizeVisible)}
-                >
-                    <ListItemIcon>
-                        {
-                            isDirSizeVisible ?
-                                <CheckOutlined /> :
-                                null
-                        }
-                    </ListItemIcon>
-                    <ListItemText>
-                        Directory size column in scan tables
+                        Size column
                     </ListItemText>
                 </MenuItem>
                 <Divider />

@@ -14,7 +14,6 @@ interface SyncDirTableRowContentProps {
     childrenSyncAggrStatus?: ActionStatus;
     isFileSizeVisible: boolean;
     isFileMtimeVisible: boolean;
-    isDirSizeVisible?: boolean;
 };
 
 export default function SyncDirTableRowContent({ syncRow, syncSide, syncStatus, childrenSyncAggrStatus, syncStatusTimestamp, isFileSizeVisible, isFileMtimeVisible }: SyncDirTableRowContentProps) {

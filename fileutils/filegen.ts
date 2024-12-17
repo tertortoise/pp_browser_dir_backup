@@ -4,7 +4,7 @@ Quick and dirty and unsafe util to make folder/files structure with big size to 
 import { WriteStream, existsSync, mkdirSync, rmSync } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import scenarios, { DirStructure } from './scenarios';
+import scenarios, { DirStructure } from '../src/app/tests/scenarios';
 import util from 'node:util';
 
 const scenariosSelection = new Set((process.argv[2] ?? '').split(' '));

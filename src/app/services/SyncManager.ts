@@ -107,7 +107,7 @@ export class SyncManager {
         const tempMap: Map<string, SyncTransaction> = new Map();
 
         this.#createDirTransaction(syncCfg, tempMap, this.#rootEventBus, this[RIGHT].entityHandle);
-
+console.log({tempMap}); // WIP
         this.#rootTransaction = [...tempMap][0][1] as SyncTransactionDir;
     };
 
@@ -318,7 +318,9 @@ export class SyncManager {
                 return;
             }
 
-        } while (nextTransactionInQueue = this.#syncTransactionsQueue?.head)
+            nextTransactionInQueue = this.#syncTransactionsQueue?.head;
+
+        } while (nextTransactionInQueue)
     }
 
     #removeTransactionFromBuffer(syncTransaction: SyncTransaction) {

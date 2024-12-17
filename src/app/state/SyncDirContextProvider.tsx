@@ -19,7 +19,6 @@ const initialState: SyncFlowState = {
     sortedByName: SORT_ASC,
     isFileSizeVisible: true,
     isFileMtimeVisible: true,
-    isDirSizeVisible: true,
     rowsPerPage: 25,
   },
   syncOptions: { 
