@@ -1,4 +1,4 @@
-import { SyncSide, SYNC_STEP_SCAN, ACTION_STATUS_WIP, ACTION_STATUS_SUCC } from "../types/servicesTypes";
+import { SyncSide, SYNC_STEP_SCAN, ACTION_STATUS_SUCC } from "../types/servicesTypes";
 import { Box, TableContainer, Table, TablePagination } from "@mui/material";
 import { isScanFlowSideStateOk, ScanTableRow, ScnaDirChildrenTreeSnapshot } from "../types/viewTypes";
 import usePaging from "../hooks/usePaging";

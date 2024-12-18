@@ -107,21 +107,31 @@ export class SyncManager {
         const tempMap: Map<string, SyncTransaction> = new Map();
 
         this.#createDirTransaction(syncCfg, tempMap, this.#rootEventBus, this[RIGHT].entityHandle);
-console.log({tempMap}); // WIP
+
         this.#rootTransaction = [...tempMap][0][1] as SyncTransactionDir;
     };
 
-    #createTransaction(syncCfg: SyncCfg<DirEntity>, syncMap: Map<string, SyncTransaction>, isFile: boolean, parentEventBus: EventTarget, rightParentDirHandle?: FileSystemDirectoryHandle) {
+    #createTransaction(
+        syncCfg: SyncCfg<DirEntity>,
+        syncMap: Map<string, SyncTransaction>,
+        isFile: boolean, parentEventBus: EventTarget,
+        rightParentDirHandle?: FileSystemDirectoryHandle
+    ) {
 
         if (isFile) {
-            this.#createFileTransaction(syncCfg as SyncCfg<DirEntityFile>, syncMap, parentEventBus, rightParentDirHandle);
+            return this.#createFileTransaction(syncCfg as SyncCfg<DirEntityFile>, syncMap, parentEventBus, rightParentDirHandle);
         } else {
-            this.#createDirTransaction(syncCfg as SyncCfg<DirEntityDir>, syncMap, parentEventBus, rightParentDirHandle);
+            return this.#createDirTransaction(syncCfg as SyncCfg<DirEntityDir>, syncMap, parentEventBus, rightParentDirHandle);
         }
 
     }
 
-    #createFileTransaction(syncCfg: SyncCfg<DirEntityFile>, syncMap: Map<string, SyncTransaction>, parentEventBus: EventTarget, rightParentDirHandle?: FileSystemDirectoryHandle) {
+    #createFileTransaction(
+        syncCfg: SyncCfg<DirEntityFile>,
+        syncMap: Map<string, SyncTransaction>,
+        parentEventBus: EventTarget,
+        rightParentDirHandle?: FileSystemDirectoryHandle
+    ) {
 
         const newFileTransaction = new SyncTransactionFile(syncCfg, parentEventBus, rightParentDirHandle);
         newFileTransaction.setSyncStatus(syncCfg.syncAction === SYNC_ACTION_EQUAL ? ACTION_NOT_REQUIRED : ACTION_STATUS_INIT, ['initial status'], Date.now());
@@ -129,12 +139,20 @@ console.log({tempMap}); // WIP
         syncMap.set(newFileTransaction.entityId, newFileTransaction);
         this.#syncTransactionsFlatMap.set(newFileTransaction.entityId, newFileTransaction);
 
+        return newFileTransaction;
     }
 
-    #createDirTransaction(syncCfg: SyncCfg<DirEntityDir>, syncMap: Map<string, SyncTransaction>, parentEventBus: EventTarget, rightParentDirHandle?: FileSystemDirectoryHandle) {
+    #createDirTransaction(
+        syncCfg: SyncCfg<DirEntityDir>,
+        syncMap: Map<string, SyncTransaction>,
+        parentEventBus: EventTarget,
+        rightParentDirHandle?: FileSystemDirectoryHandle
+    ) {
 
         const rightDiffSideChildren = syncCfg.syncAction !== SYNC_ACTION_COPYLEFT && syncCfg[RIGHT].children.size ? { [RIGHT]: syncCfg[RIGHT].children } : null;
+
         const leftDiffSideChildren = syncCfg.syncAction !== SYNC_ACTION_DELETERIGHT && syncCfg[LEFT].children.size ? { [LEFT]: syncCfg[LEFT].children } : null;
+
         const rightParentDirHandleForChildren = syncCfg.syncAction !== SYNC_ACTION_COPYLEFT ? syncCfg[RIGHT].entityHandle : undefined;
 
         let children: Map<string, SyncTransaction> | undefined = undefined;
@@ -157,6 +175,8 @@ console.log({tempMap}); // WIP
 
         syncMap.set(newDirTransaction.entityId, newDirTransaction);
         this.#syncTransactionsFlatMap.set(newDirTransaction.entityId, newDirTransaction);
+
+        return newDirTransaction;
     };
 
     #filterChildrenToSync(syncMap: Map<string, SyncTransaction>) {
@@ -178,11 +198,23 @@ console.log({tempMap}); // WIP
 
         if (diffSides[LEFT] && !diffSides[RIGHT]) { // COPYLEFT
 
-            diffSides[LEFT].forEach(dirEntity => this.#createTransaction({ syncAction: SYNC_ACTION_COPYLEFT, [LEFT]: dirEntity }, syncMap, isTypeFile(dirEntity), parentEventBus, rightParentDirHandle));
+            diffSides[LEFT].forEach(dirEntity => this.#createTransaction(
+                { syncAction: SYNC_ACTION_COPYLEFT, [LEFT]: dirEntity },
+                syncMap,
+                isTypeFile(dirEntity),
+                parentEventBus,
+                rightParentDirHandle
+            ));
 
         } else if (!diffSides[LEFT] && diffSides[RIGHT]) { // DELETERIGHT
 
-            diffSides[RIGHT].forEach(dirEntity => this.#createTransaction({ syncAction: SYNC_ACTION_DELETERIGHT, [RIGHT]: dirEntity }, syncMap, isTypeFile(dirEntity), parentEventBus, rightParentDirHandle));
+            diffSides[RIGHT].forEach(dirEntity => this.#createTransaction(
+                { syncAction: SYNC_ACTION_DELETERIGHT, [RIGHT]: dirEntity },
+                syncMap,
+                isTypeFile(dirEntity),
+                parentEventBus,
+                rightParentDirHandle
+            ));
 
         } else if (diffSides[LEFT] && diffSides[RIGHT]) { // EQUAL -> EQUAL, OVERWRITE, COPYLEFT, DELETERIGHT
 
@@ -196,7 +228,7 @@ console.log({tempMap}); // WIP
             }, { rightNameMap: new Map() });
 
             if (diffSides[RIGHT].size !== rightNameMap.size) {
-                console.warn('potential error normalizing based on current case sesitivity setting');
+                console.warn('potential error normalizing based on current case sesitivity setting', this.#syncOptions.isCaseSensitive);
             }
 
             const { rightDoneNameSet } = Array.from(diffSides[LEFT].values()).reduce<{ rightDoneNameSet: Set<string> }>((acc, nextEntity) => {
@@ -227,28 +259,59 @@ console.log({tempMap}); // WIP
 
                 if (dirsAreEqual) {
 
-                    this.#createDirTransaction({ syncAction: SYNC_ACTION_EQUAL, [LEFT]: nextEntity, [RIGHT]: equalFromRightByName }, syncMap, parentEventBus, rightParentDirHandle);
+                    this.#createDirTransaction(
+                        { syncAction: SYNC_ACTION_EQUAL, [LEFT]: nextEntity, [RIGHT]: equalFromRightByName },
+                        syncMap,
+                        parentEventBus,
+                        rightParentDirHandle
+
+                    );
 
                 } else if (filesAreFullEqual) {
 
-                    this.#createFileTransaction({ syncAction: SYNC_ACTION_EQUAL, [LEFT]: nextEntity, [RIGHT]: equalFromRightByName }, syncMap, parentEventBus, rightParentDirHandle);
+                    this.#createFileTransaction(
+                        { syncAction: SYNC_ACTION_EQUAL, [LEFT]: nextEntity, [RIGHT]: equalFromRightByName },
+                        syncMap,
+                        parentEventBus,
+                        rightParentDirHandle
+
+                    );
 
                 } else if (filesAreEqualByName) {
 
-                    this.#createFileTransaction({ syncAction: SYNC_ACTION_OVERWRITE, [LEFT]: nextEntity, [RIGHT]: equalFromRightByName }, syncMap, parentEventBus, rightParentDirHandle);
+                    this.#createFileTransaction(
+                        { syncAction: SYNC_ACTION_OVERWRITE, [LEFT]: nextEntity, [RIGHT]: equalFromRightByName },
+                        syncMap,
+                        parentEventBus,
+                        rightParentDirHandle
+
+                    );
 
                 } else {
                     /* 
                     option 1: left is present but right is not
                     option 2: two entities on left and right are present AND equal by name AND different by type, e.g. dir 'a' on left and file 'a' on right
                     */
-                    this.#createTransaction({ syncAction: SYNC_ACTION_COPYLEFT, [LEFT]: nextEntity }, syncMap, isTypeFile(nextEntity), parentEventBus, rightParentDirHandle);
+                    if (equalFromRightByName) { // option 2, next copyleft transaction will be dependnt on this one
 
-                    if (equalFromRightByName) { // option 2
-
-                        this.#createTransaction({ syncAction: SYNC_ACTION_DELETERIGHT, [RIGHT]: equalFromRightByName }, syncMap, isTypeFile(equalFromRightByName), parentEventBus, rightParentDirHandle);
-
+                        this.#createTransaction(
+                            { syncAction: SYNC_ACTION_DELETERIGHT, [RIGHT]: equalFromRightByName },
+                            syncMap,
+                            isTypeFile(equalFromRightByName),
+                            parentEventBus,
+                            rightParentDirHandle
+                        );
                     }
+
+                    this.#createTransaction(
+                        { syncAction: SYNC_ACTION_COPYLEFT, [LEFT]: nextEntity },
+                        syncMap,
+                        isTypeFile(nextEntity),
+                        parentEventBus,
+                        rightParentDirHandle
+                    );
+
+                    
                 }
                 return acc;
             }, { rightDoneNameSet: new Set() });
@@ -257,21 +320,31 @@ console.log({tempMap}); // WIP
                 if (rightDoneNameSet.has(rightEntityNameNormalized)) {
                     return;
                 }
-                this.#createTransaction({ syncAction: SYNC_ACTION_DELETERIGHT, [RIGHT]: rightEntity }, syncMap, isTypeFile(rightEntity), parentEventBus, rightParentDirHandle);
+                this.#createTransaction(
+                    { syncAction: SYNC_ACTION_DELETERIGHT, [RIGHT]: rightEntity },
+                    syncMap,
+                    isTypeFile(rightEntity),
+                    parentEventBus,
+                    rightParentDirHandle
+                );
             });
         }
         return syncMap;
     };
 
     startSync() {
-        if (!this.#rootTransaction?.children || (this.#rootTransaction.syncCfg.syncAction === SYNC_ACTION_EQUAL && !this.#rootTransaction.childrenToSyncMap?.size)) {
+        if (
+            !this.#rootTransaction?.children ||
+            (this.#rootTransaction.syncCfg.syncAction === SYNC_ACTION_EQUAL && !this.#rootTransaction.childrenToSyncMap?.size)
+        ) {
             console.error('Root dirs do not need sync. Unexpected call to sync.');
             return;
         }
 
         this.#syncTransactionsQueue = new ItemsQueue();
 
-        this.#rootTransaction.startTransaction(() => { }); // WIP special cb for root transaction?
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        this.#rootTransaction.startTransaction(() => { }); // special cb for root transaction?
         this.#addTransactionsToQueue(this.#rootTransaction.children);
         this.#fillTransactionBuffer();
     };
@@ -327,7 +400,11 @@ console.log({tempMap}); // WIP
 
         this.#currTransactionBufferSize -= this.#computeCurrentBufferSize(syncTransaction);
         this.#syncOptions.numberTransactionsMax && this.#currentTransactionBufferCount--;
-        if (!isTypeFile(syncTransaction) && syncTransaction.syncCfg.syncAction !== SYNC_ACTION_DELETERIGHT && syncTransaction.children?.size) {
+        if (
+            !isTypeFile(syncTransaction) &&
+            syncTransaction.syncCfg.syncAction !== SYNC_ACTION_DELETERIGHT &&
+            syncTransaction.children?.size
+        ) {
             this.#addTransactionsToQueue(syncTransaction.children);
         }
         this.#fillTransactionBuffer();
@@ -344,7 +421,7 @@ console.log({tempMap}); // WIP
 
         const bufferLimitIsApplicable = this.#syncOptions.bufferCopyMaxSize &&
             (syncTransaction.syncCfg.syncAction === SYNC_ACTION_OVERWRITE
-            || syncTransaction.syncCfg.syncAction === SYNC_ACTION_COPYLEFT);
+                || syncTransaction.syncCfg.syncAction === SYNC_ACTION_COPYLEFT);
 
         if (bufferLimitIsApplicable && syncTransaction.syncCfg[LEFT]?.entityType === TYPE_FILE) {
             return syncTransaction.syncCfg[LEFT].size ?? 0;

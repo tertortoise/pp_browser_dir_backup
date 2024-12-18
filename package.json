@@ -6,6 +6,7 @@
     "start": "nx serve",
     "build": "nx build",
     "test": "nx test",
+    "lint": "nx lint",
     "readme": "marked -i readme.md -o temp/readme.html"
   },
   "private": true,

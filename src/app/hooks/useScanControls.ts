@@ -47,11 +47,16 @@ export default function useScanControls(isCaseSensitive: boolean) {
 
                 const { currSyncSide, rootDir } = resolveCurrSyncSide(rootDirRefs.current, arg.entityId);
 
-                if (!currSyncSide || !rootDir || rootDirRefs.current[currSyncSide]!.scanAbortController?.signal.aborted) {
+                if (
+                    !currSyncSide ||
+                    !rootDir ||
+                    !rootDirRefs.current[currSyncSide] ||
+                    rootDirRefs.current[currSyncSide].scanAbortController?.signal.aborted
+                ) {
                     return;
                 }
 
-                rootDirRefs.current[currSyncSide]!.scanAbortController = null;
+                rootDirRefs.current[currSyncSide].scanAbortController = null;
 
                 syncStateDispatch({
                     type: ACT_SCAN_SCAN_DONE,

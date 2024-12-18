@@ -118,7 +118,8 @@ export const getSortedTableRows = (function () {
         if (!cache.get(treeSnapshot)) {
             cache.set(treeSnapshot, ({ [cacheKey]: finalTableRows }));
         } else {
-            cache.get(treeSnapshot)![cacheKey] = finalTableRows;
+            // @ts-expect-error if condition guards against get returning undefined
+            cache.get(treeSnapshot)[cacheKey] = finalTableRows;
         }
         return finalTableRows;
     }
@@ -194,7 +195,8 @@ export function getSnapshotOfSyncTree(syncTree: Map<string, SyncTransaction>, pa
                 status: entity.syncStatus,
                 childrenToSyncStatus: entity.childrenSyncAggrStatus,
                 isEmpty,
-                children: !isEmpty ? getSnapshotOfSyncTree(entity.children!, `${path}${entity.entityName}/`, new Set(parentIds).add(entityId)) : new Map(),
+                // @ts-expect-error entity.children is not undefined on non empty dirs
+                children: !isEmpty ? getSnapshotOfSyncTree(entity.children, `${path}${entity.entityName}/`, new Set(parentIds).add(entityId)) : new Map(),
                 diffStats: entity.diffStats,
             };
             snapshotTree.set(entityId, dirRow);

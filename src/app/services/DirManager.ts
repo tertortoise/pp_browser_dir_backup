@@ -118,7 +118,11 @@ export class DirEntityDir extends DirEntityBase {
 
                     childrenPromises.push(new Promise<ActionStatusResolution>(resolve => fileScanActionResolver = resolve));
 
-                    const actionStatusResolutionCfgFile: ActionStatusResolutionCfg = { resolver: fileScanActionResolver!, scanAbortController: this.actionStatusResolutionCfg.scanAbortController };
+                    const actionStatusResolutionCfgFile: ActionStatusResolutionCfg = { 
+                        // @ts-expect-error typescript does not see resolver assignment in Promise
+                        resolver: fileScanActionResolver,
+                        scanAbortController: this.actionStatusResolutionCfg.scanAbortController 
+                    };
 
                     const file = new DirEntityFile(handle as FileSystemFileHandle, actionStatusResolutionCfgFile, [...this.parents, this]);
                     this.#children.set(file.entityId, file);
@@ -128,7 +132,11 @@ export class DirEntityDir extends DirEntityBase {
                     let nestedChildrenResolver: ActionStatusResolver;
                     childrenPromises.push(new Promise<ActionStatusResolution>(resolve => nestedChildrenResolver = resolve));
 
-                    const actionStatusResolutionCfg: ActionStatusResolutionCfg = { resolver: nestedChildrenResolver!, scanAbortController: this.actionStatusResolutionCfg.scanAbortController };
+                    const actionStatusResolutionCfg: ActionStatusResolutionCfg = {
+                         // @ts-expect-error typescript does not see resolver assignment in Promise
+                        resolver: nestedChildrenResolver,
+                        scanAbortController: this.actionStatusResolutionCfg.scanAbortController 
+                    };
 
                     const dir = new DirEntityDir(handle as FileSystemDirectoryHandle, actionStatusResolutionCfg, [...this.parents, this]);
 

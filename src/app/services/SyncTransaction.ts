@@ -118,12 +118,12 @@ export abstract class SyncTransactionBase<D extends DirEntity> {
         }
 
         const transactionPromise = this.#transactionAbortController.signal.aborted ?
-            Promise.reject({cleanUpMsg: 'Cleanup is not required', cleanUpTimestamp: Date.now(), transactionErrorMsg: 'Backup was cancelled, transaction was not started'}) :
+            Promise.reject({ cleanUpMsg: 'Cleanup is not required', cleanUpTimestamp: Date.now(), transactionErrorMsg: 'Backup was cancelled, transaction was not started' }) :
             this.#iterateOverTransactionGenerator(this.executeTransaction());
 
         transactionPromise
             .then(({ transactionTimestamp = Date.now() }) => {
-                
+
                 if (this.#syncStatus !== ACTION_NOT_REQUIRED) {
                     this.setSyncStatus(ACTION_STATUS_SUCC, ['ok'], transactionTimestamp);
                 }
@@ -306,9 +306,12 @@ export abstract class SyncTransactionBase<D extends DirEntity> {
 
 export class SyncTransactionFile extends SyncTransactionBase<DirEntityFile> {
 
-    constructor(syncCfg: SyncCfg<DirEntityFile>, parentEventBus: EventTarget, rightParentDirHandle?: FileSystemDirectoryHandle) {
+    constructor(
+        syncCfg: SyncCfg<DirEntityFile>,
+        parentEventBus: EventTarget,
+        rightParentDirHandle?: FileSystemDirectoryHandle
+    ) {
         super(TYPE_FILE, syncCfg, parentEventBus, rightParentDirHandle);
-        // this.#syncCfg = syncCfg;
     }
 
     executeTransaction(): TransactionGenerator {
@@ -343,15 +346,19 @@ export class SyncTransactionFile extends SyncTransactionBase<DirEntityFile> {
             if (!this.rightParentDirHandle || !file) {
                 yield () => Promise.reject(`rightParentDirHandle or file ref is absent`);
             }
+            // @ts-expect-error if no rightParentDirHandle promise is rejected above
+            rightFileHandle = (yield () => this.rightParentDirHandle.getFileHandle(this.entityName, { create: true })) as FileSystemFileHandle;
 
-            rightFileHandle = (yield () => this.rightParentDirHandle!.getFileHandle(this.entityName, { create: true })) as FileSystemFileHandle;
+             // @ts-expect-error if rightFileHandle is absent we expect error to be caught
+            const writable = (yield () => rightFileHandle.createWritable()) as FileSystemWritableFileStream;
 
-            const writable = (yield () => rightFileHandle!.createWritable()) as FileSystemWritableFileStream;
-            const readable = file!.stream();
+             // @ts-expect-error if no file promise is rejected above
+            const readable = file.stream();
 
             yield () => readable.pipeTo(writable, { signal: this.transactionAbortController.signal });
 
-            const rightFile = (yield () => rightFileHandle!.getFile()) as File;
+            // @ts-expect-error if rightFileHandle is absent we expect error to be caught
+            const rightFile = (yield () => rightFileHandle.getFile()) as File;
 
             return {
                 timestamp: rightFile.lastModified,
@@ -359,7 +366,8 @@ export class SyncTransactionFile extends SyncTransactionBase<DirEntityFile> {
         } catch (e) {
             if (rightFileHandle) {
 
-                yield () => this.rightParentDirHandle!.removeEntry(this.entityName);
+                // @ts-expect-error if rightParentDirHandle is absent rejection is above
+                yield () => this.rightParentDirHandle.removeEntry(this.entityName);
                 return {
                     timestamp: Date.now(),
                     transactionErrorMsg: `${e}`,
@@ -391,7 +399,8 @@ export class SyncTransactionFile extends SyncTransactionBase<DirEntityFile> {
             }
 
             const writable = (yield () => rightFileHandle.createWritable()) as FileSystemWritableFileStream;
-            const readable = leftFile!.stream();
+            // @ts-expect-error if no leftFile - rejection happens above
+            const readable = leftFile.stream();
 
             yield () => readable.pipeTo(writable, { signal: this.transactionAbortController.signal });
 

@@ -4,16 +4,15 @@ Quick and dirty and unsafe util to make folder/files structure with big size to 
 import { WriteStream, existsSync, mkdirSync, rmSync } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import scenarios, { DirStructure } from '../src/app/tests/scenarios';
-import util from 'node:util';
+import scenarios, { DirStructure, DirWithFiles, FileTuple } from '../src/app/tests/scenarios';
 
 const scenariosSelection = new Set((process.argv[2] ?? '').split(' '));
 scenariosSelection.delete('');
 
 const scenariosToCreate = scenariosSelection.size ? Object.entries(scenarios).filter(([scenarioName,]) => scenariosSelection.has(scenarioName)) : Object.entries(scenarios);
 
-const rootDirPathLeft = process.env.TOP_LEVEL_DIR_LEFT ?? path.resolve(process.cwd(), './testfiles');
-const rootDirPathRight = process.env.TOP_LEVEL_DIR_RIGHT ?? path.resolve(process.cwd(), 'E:/test');
+const rootDirPathLeft = process.argv[3] ?? path.resolve(process.cwd(), './testfiles');
+const rootDirPathRight = process.argv[4] ?? path.resolve(process.cwd(), 'E:/test');
 
 createDirSync(rootDirPathLeft);
 createDirSync(rootDirPathRight);
@@ -54,13 +53,13 @@ function createDirSync(dirPath: string) {
     }
 };
 
-function createDirStructure(parentDirPath: string, dirStructure: DirStructure, isCaseSensitive: boolean): Promise<unknown> {
+function createDirStructure(parentDirPath: string, dirStructure: DirStructure<FileTuple | DirWithFiles>, isCaseSensitive: boolean): Promise<unknown> {
 
     const dirEntryPromises = dirStructure.map<Promise<unknown>>(dirEntry => {
 
-        if (Array.isArray(dirEntry)) { // file
+        if (dirEntry[0] === 'f') { // file
 
-            const [fileName, fileSize, fileMtimeFlag, fileContent = 'a'] = dirEntry;
+            const [,fileName, fileSize, fileMtimeFlag, fileContent = 'a'] = dirEntry;
 
             if (fileName && fileContent && Number(fileSize)) {
                 return createFile(path.resolve(parentDirPath, fileName), fileContent, Number(fileSize), Number(fileMtimeFlag));
@@ -68,11 +67,11 @@ function createDirStructure(parentDirPath: string, dirStructure: DirStructure, i
                 return Promise.reject(`not enough info to create file ${fileName}`);
             }
 
-        } else if (typeof dirEntry === 'object') {
+        } else {
 
-            const dirName = Object.getOwnPropertyNames(dirEntry)[0];
+            const dirName = dirEntry[1];
 
-            const dirStructureInDir = dirEntry[dirName];
+            const dirStructureInDir = dirEntry[2];
 
             if (dirName && dirStructureInDir) {
 
@@ -90,7 +89,7 @@ function createDirStructure(parentDirPath: string, dirStructure: DirStructure, i
             }
             return Promise.reject(`not enough info to create dir ${dirName}`);
 
-        } else return Promise.reject(`unknown dir entry ${util.inspect(dirEntry, {depth: null})}`);
+        };
 
     }, []);
 

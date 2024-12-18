@@ -80,7 +80,7 @@ export default function SyncDirControls() {
 
     useEffect(()=> {
         const beforeUnloadHandler = (e: Event) => {
-            console.log(isSyncing, {e}); // WIP
+            
             e.preventDefault();
             e.returnValue = true;
           };

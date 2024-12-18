@@ -1,6 +1,7 @@
 import { DirEntityDir, DirEntityFile } from "../services/DirManager";
 
-export const NOOP = () => {};
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+export const NOOP = () => { };
 
 export const LEFT = 'left';
 export const RIGHT = 'right';
@@ -17,7 +18,12 @@ export const ACTION_STATUS_RETRYING = 3;
 export const ACTION_STATUS_ERROR = 4;
 export const ACTION_STATUS_MIXED = 5;
 export const ACTION_STATUS_SUCC = 6;
-export type ActionStatusDescrete = typeof ACTION_NOT_REQUIRED | typeof ACTION_STATUS_INIT | typeof ACTION_STATUS_WIP | typeof ACTION_STATUS_ERROR | typeof ACTION_STATUS_SUCC;
+export type ActionStatusDescrete =
+    | typeof ACTION_NOT_REQUIRED
+    | typeof ACTION_STATUS_INIT
+    | typeof ACTION_STATUS_WIP
+    | typeof ACTION_STATUS_ERROR
+    | typeof ACTION_STATUS_SUCC;
 export type ActionStatusDone = typeof ACTION_STATUS_ERROR | typeof ACTION_STATUS_SUCC | typeof ACTION_STATUS_MIXED;
 export type ActionStatus = ActionStatusDescrete | typeof ACTION_STATUS_MIXED;
 
@@ -43,7 +49,7 @@ export interface TransactionGeneratorReturnType {
     transactionErrorMsg?: string;
     cleanUpMsg?: string;
 }
-export type TransactionGeneratorYield  = () => Promise<unknown>;
+export type TransactionGeneratorYield = () => Promise<unknown>;
 export type TransactionGenerator = Generator<TransactionGeneratorYield, TransactionGeneratorReturnType, unknown>;
 
 export const SCAN_ACTION_ENTITY = 'scanEntityStatus';
@@ -154,6 +160,6 @@ export type DiffStatsAcc = Record<SyncAction, {
     [key in keyof DiffTransactionStats]: DiffTransactionStats[key][];
 }>;
 
-export type DiffStatsTotals = Record<'copy' | 'delete' | 'equal', {size: number, dirsCount: number, filesCount: number}>;
+export type DiffStatsTotals = Record<'copy' | 'delete' | 'equal', { size: number, dirsCount: number, filesCount: number }>;
 
 

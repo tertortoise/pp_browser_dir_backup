@@ -14,16 +14,22 @@ export default function useSyncControls(setMenuAnchorEl?: React.Dispatch<React.S
     const {syncOptions} = useSyncState();
 
     const handleDiff = useCallback(() => {
-        const newSyncManager = new SyncManager(rootDirRefs.current[LEFT]!.rootDir, rootDirRefs.current[RIGHT]!.rootDir, syncOptions);
 
-        if (!newSyncManager.syncTree) {
-            console.error('could not get syncTree after SyncManager init');
+        if (!rootDirRefs.current[LEFT] || !rootDirRefs.current[RIGHT]) {
+            console.error('failed invariant: left/right dir absent by the time to diff');
+            return;
+        };
+
+        const newSyncManager = new SyncManager(rootDirRefs.current[LEFT].rootDir, rootDirRefs.current[RIGHT].rootDir, syncOptions);
+
+        if (!newSyncManager.syncTree || !newSyncManager.rootTransaction) {
+            console.error('failed invariant: could not get syncTree or rootTransaction after SyncManager init');
             return;
         };
 
         syncManagerRef.current = newSyncManager;
 
-        const rootTransactionId = newSyncManager.rootTransaction?.entityId ?? '';
+        const rootTransactionId = newSyncManager.rootTransaction.entityId;
 
         function statusListener(this: SyncManager, changeEvent: CustomEvent<ActionStatusChangeDetail<ActionStatus>>) {
             
@@ -44,7 +50,7 @@ export default function useSyncControls(setMenuAnchorEl?: React.Dispatch<React.S
             type: ACT_DIFF,
             status: ACTION_STATUS_SUCC,
             data: syncTreeSnapshot,
-            diffStatsTotals: newSyncManager.rootTransaction!.diffStatsTotals,
+            diffStatsTotals: newSyncManager.rootTransaction.diffStatsTotals,
             rootTransactionId,
             isReadyToInitSync: newSyncManager.rootTransaction?.childrenSyncAggrStatus !== ACTION_NOT_REQUIRED,
         });

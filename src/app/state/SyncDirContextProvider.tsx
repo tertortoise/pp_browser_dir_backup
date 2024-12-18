@@ -33,6 +33,8 @@ const StateContext = createContext<SyncFlowState>({...initialState});
 const DirRefsContext = createContext<MutableRefObject<RootDirHandleRefs>>({current: { [LEFT]: null, [RIGHT]: null }});
 const SyncManagerRefContext = createContext<MutableRefObject<SyncManager | null>>({current: null});
 
+// init
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 const DispatchContext = createContext<Dispatch<Action>>(() => {});
 
 export function SyncDirProvider({ children }: PropsWithChildren<unknown>) {
