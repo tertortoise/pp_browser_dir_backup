@@ -59,12 +59,12 @@ export class DirEntityDir extends DirEntityBase {
     #isCaseSensitive: boolean;
 
 
-    constructor(entityHandle: FileSystemDirectoryHandle, actionStatusResolutionCfg: ActionStatusResolutionCfg, parents: DirEntityDir[], isCaseSensitive = false) {
+    constructor(entityHandle: FileSystemDirectoryHandle, actionStatusResolutionCfg: ActionStatusResolutionCfg, parents: DirEntityDir[], isCaseSensitive: boolean) {
         super(actionStatusResolutionCfg, parents);
         this.#entityHandle = entityHandle;
         this[SCAN_ACTION_ENTITY] = { statusValue: ACTION_STATUS_SUCC, actionTime: Date.now(), actionResultMsg: 'Ok' };
         this[SCAN_ACTION_CHILD_NESTED] = { statusValue: ACTION_STATUS_WIP, actionTime: Date.now(), actionResultMsg: 'initial scan upon creation' };
-        this.#isCaseSensitive = !!isCaseSensitive;
+        this.#isCaseSensitive = isCaseSensitive;
         this.scanDir();
     }
 
@@ -138,7 +138,7 @@ export class DirEntityDir extends DirEntityBase {
                         scanAbortController: this.actionStatusResolutionCfg.scanAbortController 
                     };
 
-                    const dir = new DirEntityDir(handle as FileSystemDirectoryHandle, actionStatusResolutionCfg, [...this.parents, this]);
+                    const dir = new DirEntityDir(handle as FileSystemDirectoryHandle, actionStatusResolutionCfg, [...this.parents, this], this.#isCaseSensitive);
 
                     this.#children.set(dir.entityId, dir);
 
