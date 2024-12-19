@@ -40,8 +40,6 @@ export default function SyncDirBlock({ rootDirNames }: { rootDirNames: { [LEFT]:
 
     const syncStateDiff = syncState[SYNC_STEP_DIFF];
 
-
-    // WIP pageStateDiff.status === ERROR ?
     const isSuccessDiffStatus = syncStateDiff.status === ACTION_STATUS_SUCC;
 
     const { handleCollapseSingleDir, tableRows, collapsedDirsSet } = useGetTableRows<SyncTreeSnapshot, SyncTableRow>(isSuccessDiffStatus ? syncStateDiff.data : undefined);

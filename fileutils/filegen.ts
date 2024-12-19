@@ -1,15 +1,30 @@
 /*
 Quick and dirty and unsafe util to make folder/files structure with big size to test file system api
+For win and linux
 */
 import { WriteStream, existsSync, mkdirSync, rmSync } from 'node:fs';
 import fs from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 import scenarios, { DirStructure, DirWithFiles, FileTuple } from '../src/app/tests/scenarios';
 
 const scenariosSelection = new Set((process.argv[2] ?? '').split(' '));
 scenariosSelection.delete('');
 
-const scenariosToCreate = scenariosSelection.size ? Object.entries(scenarios).filter(([scenarioName,]) => scenariosSelection.has(scenarioName)) : Object.entries(scenarios);
+const platform = os.platform();
+const isWin = platform === 'win32';
+const isLinux = platform === 'linux';
+
+
+const scenariosToCreateOld = scenariosSelection.size ? Object.entries(scenarios).filter(([scenarioName,]) => {
+    scenariosSelection.has(scenarioName)
+}) : Object.entries(scenarios);
+
+const scenariosToCreate = Object.entries(scenarios).filter(([scenarioName, scenario]) => {
+    const isNameIncluded = scenariosSelection.size ? scenariosSelection.has(scenarioName) : true;
+    const isRelevantForPlatform = (scenario.isCaseSensitive && isLinux) || (!scenario.isCaseSensitive && isWin);
+    return isNameIncluded && isRelevantForPlatform;
+});
 
 const rootDirPathLeft = process.argv[3] ?? path.resolve(process.cwd(), './testfiles');
 const rootDirPathRight = process.argv[4] ?? path.resolve(process.cwd(), 'E:/test');

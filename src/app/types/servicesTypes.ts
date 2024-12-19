@@ -82,7 +82,7 @@ export interface ActionStatusChangeDetail<T extends ActionStatus> {
     timestamp: number;
 };
 
-export type ActionStatusResolution = // WIP only in scan, delete
+export type ActionStatusResolution = 
     & { entityId: string; statusValue: typeof ACTION_STATUS_SUCC; }
     & (
         | { actionType: typeof SCAN_ACTION_ENTITY; entityType: typeof TYPE_FILE }

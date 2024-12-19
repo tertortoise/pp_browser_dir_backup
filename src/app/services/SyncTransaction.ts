@@ -22,23 +22,8 @@ export abstract class SyncTransactionBase<D extends DirEntity> {
         this.#transactionAbortController.abort('Backup was cancelled.');
         this.selfEventBus.dispatchEvent(new CustomEvent('cancel'));
     }
-
-
-    constructor(
-        entityType: D['entityType'],
-        syncCfg: SyncCfg<D>,
-        parentEventBus: EventTarget,
-        rightParentDirHandle?: FileSystemDirectoryHandle
-    ) {
-        this.#entityType = entityType;
-        this.#parentEventBus = parentEventBus;
-        this.#entityName = LEFT in syncCfg ? syncCfg[LEFT].entityName : syncCfg[RIGHT].entityName;
-        this.#rightParentDirHandle = rightParentDirHandle;
-        this.#syncCfg = syncCfg;
-        this.#parentEventBus.addEventListener('cancel', this.#cancelCallback);
-        this.#selfEventBus?.addEventListener(SYNC_STATUS_CHANGE, this.#monitorAggrSyncStatus);
-        this.#selfEventBus?.addEventListener(SYNC_STATUS_AGGR_CHANGE, this.#monitorAggrSyncStatus);
-    }
+    dependants: Map<string, SyncTransaction> | null = null;
+    dependency: SyncTransaction | null = null;
 
     get entityId() { return this.#entityId; }
     get entityName() { return this.#entityName; }
@@ -81,6 +66,25 @@ export abstract class SyncTransactionBase<D extends DirEntity> {
             this.#monitorAggrSyncStatus(changeEvent);
         }
     }
+
+
+    constructor(
+        entityType: D['entityType'],
+        syncCfg: SyncCfg<D>,
+        parentEventBus: EventTarget,
+        rightParentDirHandle?: FileSystemDirectoryHandle
+    ) {
+        this.#entityType = entityType;
+        this.#parentEventBus = parentEventBus;
+        this.#entityName = LEFT in syncCfg ? syncCfg[LEFT].entityName : syncCfg[RIGHT].entityName;
+        this.#rightParentDirHandle = rightParentDirHandle;
+        this.#syncCfg = syncCfg;
+        this.#parentEventBus.addEventListener('cancel', this.#cancelCallback);
+        this.#selfEventBus?.addEventListener(SYNC_STATUS_CHANGE, this.#monitorAggrSyncStatus);
+        this.#selfEventBus?.addEventListener(SYNC_STATUS_AGGR_CHANGE, this.#monitorAggrSyncStatus);
+    }
+
+   
 
     abstract executeTransaction(): TransactionGenerator;
 

@@ -292,18 +292,8 @@ export class SyncManager {
                     option 1: left is present but right is not
                     option 2: two entities on left and right are present AND equal by name AND different by type, e.g. dir 'a' on left and file 'a' on right
                     */
-                    if (equalFromRightByName) { // option 2, next copyleft transaction will be dependnt on this one
 
-                        this.#createTransaction(
-                            { syncAction: SYNC_ACTION_DELETERIGHT, [RIGHT]: equalFromRightByName },
-                            syncMap,
-                            isTypeFile(equalFromRightByName),
-                            parentEventBus,
-                            rightParentDirHandle
-                        );
-                    }
-
-                    this.#createTransaction(
+                    const dependant = this.#createTransaction(
                         { syncAction: SYNC_ACTION_COPYLEFT, [LEFT]: nextEntity },
                         syncMap,
                         isTypeFile(nextEntity),
@@ -311,7 +301,24 @@ export class SyncManager {
                         rightParentDirHandle
                     );
 
-                    
+                    if (equalFromRightByName) { // option 2, prev copyleft transaction will be dependnt on this one
+
+                        const dependency = this.#createTransaction(
+                            { syncAction: SYNC_ACTION_DELETERIGHT, [RIGHT]: equalFromRightByName },
+                            syncMap,
+                            isTypeFile(equalFromRightByName),
+                            parentEventBus,
+                            rightParentDirHandle
+                        );
+
+                        dependant.dependency = dependency;
+                        
+                        if (!dependency.dependants) {
+                            dependency.dependants = new Map();  
+                        }
+                        
+                        dependency.dependants.set(dependant.entityId, dependant);
+                    }
                 }
                 return acc;
             }, { rightDoneNameSet: new Set() });
@@ -361,12 +368,11 @@ export class SyncManager {
         } else {
             this.#addTransactionToQueue(syncArg);
         }
-
     }
 
     #addTransactionToQueue(syncTransaction: SyncTransaction) {
 
-        if (this.#checkTransactionInNeedOfSync(syncTransaction)) {
+        if (this.#checkTransactionInNeedOfSync(syncTransaction) && !syncTransaction.dependency) {
             this.#syncTransactionsQueue?.enqueue(syncTransaction);
         }
     }
@@ -400,6 +406,12 @@ export class SyncManager {
 
         this.#currTransactionBufferSize -= this.#computeCurrentBufferSize(syncTransaction);
         this.#syncOptions.numberTransactionsMax && this.#currentTransactionBufferCount--;
+
+        syncTransaction.dependants?.forEach(dependant => {
+            dependant.dependency = null;
+            this.#addTransactionsToQueue(dependant);
+        });
+    
         if (
             !isTypeFile(syncTransaction) &&
             syncTransaction.syncCfg.syncAction !== SYNC_ACTION_DELETERIGHT &&
